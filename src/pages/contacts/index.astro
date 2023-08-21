@@ -7,7 +7,7 @@ const contacts = search ? await db.search(search) : await db.all();
 ---
 
 <Layout>
-	<main class="flex flex-col gap-8">
+	<main class="flex flex-col items-start gap-8">
 		<form action="/contacts" method="get">
 			<label for="search" class="sr-only">Search</label>
 			<input
@@ -22,7 +22,7 @@ const contacts = search ? await db.search(search) : await db.all();
 				value={search}
 			/>
 		</form>
-		<table class="max-w-full border-collapse divide-y indent-0">
+		<table class="w-full max-w-full border-collapse divide-y indent-0">
 			<thead>
 				<tr>
 					<th
@@ -31,7 +31,11 @@ const contacts = search ? await db.search(search) : await db.all();
 					>
 					<th
 						class="px-3 py-3.5 text-left text-sm font-semibold first-of-type:pl-0"
-						scope="col">Name</th
+						scope="col">First</th
+					>
+					<th
+						class="px-3 py-3.5 text-left text-sm font-semibold first-of-type:pl-0"
+						scope="col">Last</th
 					>
 					<th
 						class="px-3 py-3.5 text-left text-sm font-semibold first-of-type:pl-0"
@@ -52,7 +56,10 @@ const contacts = search ? await db.search(search) : await db.all();
 								{contact.id}
 							</td>
 							<td class="whitespace-nowrap px-3 py-4 text-left text-sm first-of-type:pl-0">
-								{contact.name}
+								{contact.firstName}
+							</td>
+							<td class="whitespace-nowrap px-3 py-4 text-left text-sm first-of-type:pl-0">
+								{contact.lastName}
 							</td>
 							<td class="whitespace-nowrap px-3 py-4 text-left text-sm first-of-type:pl-0">
 								{contact.email}
