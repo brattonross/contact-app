@@ -1,0 +1,51 @@
+---
+import { db } from "~/contacts.ts";
+import Layout from "./_layout.astro";
+
+const search = Astro.url.searchParams.get("q");
+const contacts = search ? await db.search(search) : await db.all();
+---
+
+<Layout>
+	<main class="flex flex-col gap-8">
+		<form action="/contacts" method="get">
+			<label for="search" class="sr-only">Search</label>
+			<input
+				id="search"
+				class="rounded-md bg-white dark:bg-slate-1 sm:text-sm"
+				name="q"
+				placeholder="Search"
+				type="search"
+				value={search}
+			/>
+		</form>
+		<table class="max-w-full border-collapse divide-y indent-0">
+			<thead>
+				<tr>
+					<th
+						class="px-3 py-3.5 text-left text-sm font-semibold first-of-type:pl-0"
+						scope="col">ID</th
+					>
+					<th
+						class="px-3 py-3.5 text-left text-sm font-semibold first-of-type:pl-0"
+						scope="col">Name</th
+					>
+				</tr>
+			</thead>
+			<tbody class="divide-y">
+				{
+					contacts.map((contact) => (
+						<tr>
+							<td class="whitespace-nowrap px-3 py-4 text-left text-sm first-of-type:pl-0">
+								{contact.id}
+							</td>
+							<td class="whitespace-nowrap px-3 py-4 text-left text-sm first-of-type:pl-0">
+								{contact.name}
+							</td>
+						</tr>
+					))
+				}
+			</tbody>
+		</table>
+	</main>
+</Layout>

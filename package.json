@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "contact.app",
+  "type": "module",
+  "scripts": {
+    "build": "astro build",
+    "dev": "astro dev",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "astro": "^2.10.12"
+  },
+  "devDependencies": {
+    "@astrojs/tailwind": "^4.0.0",
+    "@radix-ui/colors": "^2.1.0",
+    "@tailwindcss/forms": "^0.5.4",
+    "@types/node": "^20.5.1",
+    "bun-types": "^0.7.3",
+    "prettier": "^3.0.2",
+    "prettier-plugin-astro": "^0.11.1",
+    "prettier-plugin-tailwindcss": "^0.5.3",
+    "tailwindcss": "^3.3.3",
+    "typescript": "^5.1.6",
+    "windy-radix-palette": "^0.6.1"
+  }
+}

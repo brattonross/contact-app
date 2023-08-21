@@ -1,0 +1,22 @@
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width initial-scale=1.0" />
+		<title>Contact.app</title>
+		<style>
+			html {
+				color-scheme: light dark;
+			}
+			@media (prefers-color-scheme: dark) {
+				html {
+					color-scheme: dark light;
+				}
+			}
+		</style>
+	</head>
+	<body class="bg-white text-slate-12 antialiased dark:bg-slate-1">
+		<div class="px-6 py-12">
+			<slot />
+		</div>
+	</body>
+</html>
