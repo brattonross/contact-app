@@ -1,6 +1,6 @@
 ---
 import { db } from "~/contacts.ts";
-import Layout from "./_layout.astro";
+import Layout from "../_layout.astro";
 
 const search = Astro.url.searchParams.get("q");
 const contacts = search ? await db.search(search) : await db.all();
@@ -12,9 +12,12 @@ const contacts = search ? await db.search(search) : await db.all();
 			<label for="search" class="sr-only">Search</label>
 			<input
 				id="search"
+				autocomplete="off"
+				autocapitalize="off"
 				class="rounded-md bg-white dark:bg-slate-1 sm:text-sm"
 				name="q"
 				placeholder="Search"
+				spellcheck="false"
 				type="search"
 				value={search}
 			/>
@@ -30,6 +33,15 @@ const contacts = search ? await db.search(search) : await db.all();
 						class="px-3 py-3.5 text-left text-sm font-semibold first-of-type:pl-0"
 						scope="col">Name</th
 					>
+					<th
+						class="px-3 py-3.5 text-left text-sm font-semibold first-of-type:pl-0"
+						scope="col">Email</th
+					>
+					<th
+						class="px-3 py-3.5 text-left text-sm font-semibold first-of-type:pl-0"
+						scope="col">Phone</th
+					>
+					<th></th>
 				</tr>
 			</thead>
 			<tbody class="divide-y">
@@ -42,10 +54,33 @@ const contacts = search ? await db.search(search) : await db.all();
 							<td class="whitespace-nowrap px-3 py-4 text-left text-sm first-of-type:pl-0">
 								{contact.name}
 							</td>
+							<td class="whitespace-nowrap px-3 py-4 text-left text-sm first-of-type:pl-0">
+								{contact.email}
+							</td>
+							<td class="whitespace-nowrap px-3 py-4 text-left text-sm first-of-type:pl-0">
+								{contact.phone}
+							</td>
+							<td class="flex items-center justify-end gap-2 whitespace-nowrap px-3 py-4 text-sm first-of-type:pl-0">
+								<a
+									href={`/contacts/${contact.id}/edit`}
+									class="text-blue-11 hover:underline"
+								>
+									Edit
+								</a>
+								<a
+									href={`/contacts/${contact.id}`}
+									class="text-blue-11 hover:underline"
+								>
+									View
+								</a>
+							</td>
 						</tr>
 					))
 				}
 			</tbody>
 		</table>
+		<a href="/contacts/new" class="text-sm text-blue-11 hover:underline"
+			>Add Contact</a
+		>
 	</main>
 </Layout>
