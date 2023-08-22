@@ -1,17 +1,31 @@
 ---
 import A from "~/components/A.astro";
 import { db } from "~/contacts";
+import { flash } from "~/flash";
 import Layout from "~/pages/_layout.astro";
 
-const contactId = Astro.params.contactId;
-if (!contactId) {
+const contactId = Number(Astro.params.contactId);
+if (!contactId || Number.isNaN(contactId)) {
 	return new Response("Not found.", {
 		status: 404,
 		statusText: "Not found.",
 	});
 }
 
-const contact = await db.getById(Number(contactId));
+if (!["GET", "DELETE"].includes(Astro.request.method)) {
+	return new Response("Method not allowed.", {
+		status: 405,
+		statusText: "Method not allowed.",
+	});
+}
+
+if (Astro.request.method === "DELETE") {
+	await db.delete(contactId);
+	flash.success("Contact deleted.");
+	return Astro.redirect("/contacts", 303);
+}
+
+const contact = await db.getById(contactId);
 if (!contact) {
 	return new Response("Not found.", {
 		status: 404,

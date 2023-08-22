@@ -32,6 +32,7 @@ import { flash } from "~/flash";
 			role="region"
 		>
 			<ol
+				id="notifications"
 				class="fixed inset-x-1/2 bottom-0 z-[9999] m-0 flex w-[390px] max-w-full -translate-x-1/2 flex-col gap-2 p-5 outline-none"
 			>
 				{
@@ -48,21 +49,29 @@ import { flash } from "~/flash";
 					))
 				}
 			</ol>
-		</div>
-		<script>
-			const notifications = document.querySelectorAll(
-				"[data-notification]",
-			);
-			for (let i = 0; i < notifications.length; i++) {
-				const notification = notifications[i];
-				if (!notification) {
-					continue;
+			<script>
+				function autoRemoveNotifications() {
+					const notifications = document.querySelectorAll(
+						"[data-notification]",
+					);
+					for (let i = 0; i < notifications.length; i++) {
+						const notification = notifications[i];
+						if (!notification) {
+							continue;
+						}
+
+						setTimeout(() => {
+							notification.remove();
+						}, 5000);
+					}
 				}
 
-				setTimeout(() => {
-					notification.remove();
-				}, 5000);
-			}
-		</script>
+				document.addEventListener("htmx:afterSwap", () => {
+					autoRemoveNotifications();
+				});
+
+				autoRemoveNotifications();
+			</script>
+		</div>
 	</body>
 </html>

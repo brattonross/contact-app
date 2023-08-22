@@ -54,9 +54,13 @@ type ButtonVariantProps = VariantProps<typeof buttonClass>;
 
 export type Props = HTMLAttributes<"button"> & ButtonVariantProps;
 
-const { class: className, tone, ...props } = Astro.props;
+const { class: className, tone, type = "button", ...props } = Astro.props;
 ---
 
-<button class={twMerge(buttonClass({ tone }), className)} {...props}>
+<button
+	class={twMerge(buttonClass({ tone }), className)}
+	type={type}
+	{...props}
+>
 	<slot />
 </button>
