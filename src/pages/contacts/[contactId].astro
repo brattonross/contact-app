@@ -1,0 +1,50 @@
+---
+import A from "~/components/A.astro";
+import { db } from "~/contacts";
+import Layout from "../_layout.astro";
+
+const contactId = Astro.params.contactId;
+if (!contactId) {
+	return new Response("Not found.", {
+		status: 404,
+		statusText: "Not found.",
+	});
+}
+
+const contact = await db.getById(Number(contactId));
+if (!contact) {
+	return new Response("Not found.", {
+		status: 404,
+		statusText: "Not found.",
+	});
+}
+---
+
+<Layout>
+	<h1 class="text-xl font-semibold">
+		{contact.firstName}
+		{contact.lastName}
+	</h1>
+	<dl class="divide-y">
+		<div class="sm:grid-cols px-4 py-6 sm:grid sm:gap-2 sm:px-0">
+			<dt class="text-sm font-medium text-hi-contrast">Phone</dt>
+			<dd
+				class="mt-1 text-sm leading-6 text-lo-contrast sm:col-span-2 sm:mt-0"
+			>
+				{contact.phone}
+			</dd>
+		</div>
+		<div class="sm:grid-cols px-4 py-6 sm:grid sm:gap-2 sm:px-0">
+			<dt class="text-sm font-medium text-hi-contrast">Email</dt>
+			<dd
+				class="mt-1 text-sm leading-6 text-lo-contrast sm:col-span-2 sm:mt-0"
+			>
+				{contact.email}
+			</dd>
+		</div>
+	</dl>
+	<div class="flex items-center gap-4">
+		<A href={`/contacts/${contact.id}/edit`}>Edit</A>
+		<A href="/contacts">Back</A>
+	</div>
+</Layout>

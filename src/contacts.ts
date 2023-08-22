@@ -50,6 +50,10 @@ class ContactsDb {
 		});
 	}
 
+	public async getById(id: number): Promise<Contact | undefined> {
+		return this.#contacts.find((contact) => contact.id === id);
+	}
+
 	public async create(props: Omit<Contact, "id">): Promise<Contact> {
 		const id = this.#contacts.length + 1;
 		const contact = { id, ...props };
