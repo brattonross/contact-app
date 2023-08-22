@@ -60,6 +60,15 @@ class ContactsDb {
 		this.#contacts.push(contact);
 		return contact;
 	}
+
+	public async update(id: number, props: Partial<Contact>): Promise<Contact> {
+		const contact = await this.getById(id);
+		if (!contact) {
+			throw new Error(`Contact with id ${id} not found`);
+		}
+		Object.assign(contact, props);
+		return contact;
+	}
 }
 
 export const db = new ContactsDb();

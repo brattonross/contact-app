@@ -1,0 +1,135 @@
+---
+import type { z } from "zod";
+import Button from "~/components/Button.astro";
+import ErrorMessage from "~/components/ErrorMessage.astro";
+import Input from "~/components/Input.astro";
+import Label from "~/components/Label.astro";
+import { contactSchema, db } from "~/contacts";
+import Layout from "~/pages/_layout.astro";
+
+const contactId = Number(Astro.params.contactId);
+if (!contactId || Number.isNaN(contactId)) {
+	return new Response("Not found.", {
+		status: 404,
+		statusText: "Not found.",
+	});
+}
+
+const contact = await db.getById(contactId);
+if (!contact) {
+	return new Response("Not found.", {
+		status: 404,
+		statusText: "Not found.",
+	});
+}
+
+const editContactRequestSchema = contactSchema.omit({
+	id: true,
+});
+
+let errors: z.inferFlattenedErrors<typeof editContactRequestSchema> | null =
+	null;
+
+if (Astro.request.method === "POST") {
+	const formData = await Astro.request.formData();
+	const updatedContact = {
+		firstName: formData.get("firstName")?.toString() ?? contact.firstName,
+		lastName: formData.get("lastName")?.toString() ?? contact.lastName,
+		phone: formData.get("phone")?.toString() ?? contact.phone,
+		email: formData.get("email")?.toString() ?? contact.email,
+	};
+
+	const result = editContactRequestSchema.safeParse(updatedContact);
+	if (result.success) {
+		await db.update(contactId, result.data);
+		return Astro.redirect("/contacts");
+	}
+
+	errors = result.error.flatten();
+}
+---
+
+<Layout>
+	<form
+		action={`/contacts/${contactId}/edit`}
+		method="post"
+		class="mx-auto w-full max-w-3xl space-y-8"
+	>
+		<fieldset class="space-y-4">
+			<legend>Contact Values</legend>
+			<div class="grid grid-cols-6 gap-x-6 gap-y-8">
+				<div class="col-span-3 space-y-2">
+					<Label for="first_name">First Name</Label>
+					<Input
+						id="first_name"
+						name="firstName"
+						tone={errors?.fieldErrors?.firstName
+							? "danger"
+							: undefined}
+						value={contact.firstName}
+					/>
+					{
+						errors?.fieldErrors?.firstName ? (
+							<ErrorMessage>
+								{errors.fieldErrors.firstName[0]}
+							</ErrorMessage>
+						) : null
+					}
+				</div>
+				<div class="col-span-3 space-y-2">
+					<Label for="last_name">Last Name</Label>
+					<Input
+						id="last_name"
+						name="lastName"
+						tone={errors?.fieldErrors?.lastName
+							? "danger"
+							: undefined}
+						value={contact.lastName}
+					/>
+					{
+						errors?.fieldErrors?.lastName ? (
+							<ErrorMessage>
+								{errors.fieldErrors.lastName[0]}
+							</ErrorMessage>
+						) : null
+					}
+				</div>
+				<div class="col-span-6 space-y-2">
+					<Label for="phone">Phone</Label>
+					<Input
+						id="phone"
+						name="phone"
+						tone={errors?.fieldErrors?.phone ? "danger" : undefined}
+						value={contact.phone}
+					/>
+					{
+						errors?.fieldErrors?.phone ? (
+							<ErrorMessage>
+								{errors.fieldErrors.phone[0]}
+							</ErrorMessage>
+						) : null
+					}
+				</div>
+				<div class="col-span-6 space-y-2">
+					<Label for="email">Email</Label>
+					<Input
+						id="email"
+						name="email"
+						tone={errors?.fieldErrors?.email ? "danger" : undefined}
+						value={contact.email}
+					/>
+					{
+						errors?.fieldErrors?.email ? (
+							<ErrorMessage>
+								{errors.fieldErrors.email[0]}
+							</ErrorMessage>
+						) : null
+					}
+				</div>
+			</div>
+		</fieldset>
+		<div class="flex items-center gap-3">
+			<Button type="submit">Save</Button>
+		</div>
+	</form>
+</Layout>
