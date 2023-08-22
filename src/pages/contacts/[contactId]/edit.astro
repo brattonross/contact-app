@@ -16,7 +16,7 @@ if (!contactId || Number.isNaN(contactId)) {
 	});
 }
 
-const contact = await db.getById(contactId);
+let contact = await db.getById(contactId);
 if (!contact) {
 	return new Response("Not found.", {
 		status: 404,
@@ -24,23 +24,36 @@ if (!contact) {
 	});
 }
 
-const editContactRequestSchema = contactSchema.omit({
-	id: true,
-});
+const editContactRequestSchema = contactSchema
+	.omit({
+		id: true,
+	})
+	.extend({
+		email: contactSchema.shape.email.refine(
+			async (value) => {
+				const exists = await db.emailExists(value, contactId);
+				return !exists;
+			},
+			{
+				message: "Email already in use.",
+			},
+		),
+	});
 
 let errors: z.inferFlattenedErrors<typeof editContactRequestSchema> | null =
 	null;
 
 if (Astro.request.method === "POST") {
 	const formData = await Astro.request.formData();
-	const updatedContact = {
+	contact = {
+		...contact,
 		firstName: formData.get("firstName")?.toString() ?? contact.firstName,
 		lastName: formData.get("lastName")?.toString() ?? contact.lastName,
 		phone: formData.get("phone")?.toString() ?? contact.phone,
 		email: formData.get("email")?.toString() ?? contact.email,
 	};
 
-	const result = editContactRequestSchema.safeParse(updatedContact);
+	const result = await editContactRequestSchema.safeParseAsync(contact);
 	if (result.success) {
 		await db.update(contactId, result.data);
 		flash.success("Contact updated.");
@@ -63,76 +76,56 @@ if (Astro.request.method === "POST") {
 				<legend>Contact Values</legend>
 				<div class="grid grid-cols-6 gap-x-6 gap-y-8">
 					<div class="col-span-3 space-y-2">
-						<Label for="first_name">First Name</Label>
+						<Label for="first-name">First Name</Label>
 						<Input
-							id="first_name"
+							id="first-name"
+							aria-describedby="first-name-error"
 							name="firstName"
-							tone={errors?.fieldErrors?.firstName
-								? "danger"
-								: undefined}
 							value={contact.firstName}
 						/>
-						{
-							errors?.fieldErrors?.firstName ? (
-								<ErrorMessage>
-									{errors.fieldErrors.firstName[0]}
-								</ErrorMessage>
-							) : null
-						}
+						<ErrorMessage id="first-name-error">
+							{errors?.fieldErrors.firstName?.[0]}
+						</ErrorMessage>
 					</div>
 					<div class="col-span-3 space-y-2">
-						<Label for="last_name">Last Name</Label>
+						<Label for="last-name">Last Name</Label>
 						<Input
-							id="last_name"
+							id="last-name"
+							aria-describedby="last-name-error"
 							name="lastName"
-							tone={errors?.fieldErrors?.lastName
-								? "danger"
-								: undefined}
 							value={contact.lastName}
 						/>
-						{
-							errors?.fieldErrors?.lastName ? (
-								<ErrorMessage>
-									{errors.fieldErrors.lastName[0]}
-								</ErrorMessage>
-							) : null
-						}
+						<ErrorMessage id="last-name-error">
+							{errors?.fieldErrors.lastName?.[0]}
+						</ErrorMessage>
 					</div>
 					<div class="col-span-6 space-y-2">
 						<Label for="phone">Phone</Label>
 						<Input
 							id="phone"
+							aria-describedby="phone-error"
 							name="phone"
-							tone={errors?.fieldErrors?.phone
-								? "danger"
-								: undefined}
 							value={contact.phone}
 						/>
-						{
-							errors?.fieldErrors?.phone ? (
-								<ErrorMessage>
-									{errors.fieldErrors.phone[0]}
-								</ErrorMessage>
-							) : null
-						}
+						<ErrorMessage id="phone-error">
+							{errors?.fieldErrors.phone?.[0]}
+						</ErrorMessage>
 					</div>
 					<div class="col-span-6 space-y-2">
 						<Label for="email">Email</Label>
 						<Input
 							id="email"
+							aria-describedby="email-error"
+							hx-get={`/contacts/email?contactId=${contactId}`}
+							hx-target="next [data-error-message]"
+							hx-trigger="change, keyup delay:200ms changed"
 							name="email"
-							tone={errors?.fieldErrors?.email
-								? "danger"
-								: undefined}
+							type="email"
 							value={contact.email}
 						/>
-						{
-							errors?.fieldErrors?.email ? (
-								<ErrorMessage>
-									{errors.fieldErrors.email[0]}
-								</ErrorMessage>
-							) : null
-						}
+						<ErrorMessage id="email-error">
+							{errors?.fieldErrors.email?.[0]}
+						</ErrorMessage>
 					</div>
 				</div>
 			</fieldset>

@@ -55,6 +55,10 @@ class ContactsDb {
 	}
 
 	public async create(props: Omit<Contact, "id">): Promise<Contact> {
+		if (await this.emailExists(props.email)) {
+			throw new Error(`Email ${props.email} already in use.`);
+		}
+
 		const id = this.#contacts.length + 1;
 		const contact = { id, ...props };
 		this.#contacts.push(contact);
@@ -76,6 +80,18 @@ class ContactsDb {
 			return;
 		}
 		this.#contacts.splice(index, 1);
+	}
+
+	public async emailExists(
+		email: string,
+		ignoreId?: number
+	): Promise<boolean> {
+		const contact = this.#contacts.find(
+			(contact) =>
+				contact.email.toLowerCase() === email.toLowerCase() &&
+				contact.id !== ignoreId
+		);
+		return Boolean(contact);
 	}
 }
 
