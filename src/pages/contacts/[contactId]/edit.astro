@@ -5,6 +5,7 @@ import ErrorMessage from "~/components/ErrorMessage.astro";
 import Input from "~/components/Input.astro";
 import Label from "~/components/Label.astro";
 import { contactSchema, db } from "~/contacts";
+import { flash } from "~/flash";
 import Layout from "~/pages/_layout.astro";
 
 const contactId = Number(Astro.params.contactId);
@@ -42,6 +43,7 @@ if (Astro.request.method === "POST") {
 	const result = editContactRequestSchema.safeParse(updatedContact);
 	if (result.success) {
 		await db.update(contactId, result.data);
+		flash.success("Contact updated.");
 		return Astro.redirect("/contacts");
 	}
 
@@ -50,86 +52,96 @@ if (Astro.request.method === "POST") {
 ---
 
 <Layout>
-	<form
-		action={`/contacts/${contactId}/edit`}
-		method="post"
-		class="mx-auto w-full max-w-3xl space-y-8"
-	>
-		<fieldset class="space-y-4">
-			<legend>Contact Values</legend>
-			<div class="grid grid-cols-6 gap-x-6 gap-y-8">
-				<div class="col-span-3 space-y-2">
-					<Label for="first_name">First Name</Label>
-					<Input
-						id="first_name"
-						name="firstName"
-						tone={errors?.fieldErrors?.firstName
-							? "danger"
-							: undefined}
-						value={contact.firstName}
-					/>
-					{
-						errors?.fieldErrors?.firstName ? (
-							<ErrorMessage>
-								{errors.fieldErrors.firstName[0]}
-							</ErrorMessage>
-						) : null
-					}
+	<section class="mx-auto w-full max-w-3xl space-y-6">
+		<form
+			id="edit-contact"
+			action={`/contacts/${contactId}/edit`}
+			method="post"
+			class="space-y-8"
+		>
+			<fieldset class="space-y-4">
+				<legend>Contact Values</legend>
+				<div class="grid grid-cols-6 gap-x-6 gap-y-8">
+					<div class="col-span-3 space-y-2">
+						<Label for="first_name">First Name</Label>
+						<Input
+							id="first_name"
+							name="firstName"
+							tone={errors?.fieldErrors?.firstName
+								? "danger"
+								: undefined}
+							value={contact.firstName}
+						/>
+						{
+							errors?.fieldErrors?.firstName ? (
+								<ErrorMessage>
+									{errors.fieldErrors.firstName[0]}
+								</ErrorMessage>
+							) : null
+						}
+					</div>
+					<div class="col-span-3 space-y-2">
+						<Label for="last_name">Last Name</Label>
+						<Input
+							id="last_name"
+							name="lastName"
+							tone={errors?.fieldErrors?.lastName
+								? "danger"
+								: undefined}
+							value={contact.lastName}
+						/>
+						{
+							errors?.fieldErrors?.lastName ? (
+								<ErrorMessage>
+									{errors.fieldErrors.lastName[0]}
+								</ErrorMessage>
+							) : null
+						}
+					</div>
+					<div class="col-span-6 space-y-2">
+						<Label for="phone">Phone</Label>
+						<Input
+							id="phone"
+							name="phone"
+							tone={errors?.fieldErrors?.phone
+								? "danger"
+								: undefined}
+							value={contact.phone}
+						/>
+						{
+							errors?.fieldErrors?.phone ? (
+								<ErrorMessage>
+									{errors.fieldErrors.phone[0]}
+								</ErrorMessage>
+							) : null
+						}
+					</div>
+					<div class="col-span-6 space-y-2">
+						<Label for="email">Email</Label>
+						<Input
+							id="email"
+							name="email"
+							tone={errors?.fieldErrors?.email
+								? "danger"
+								: undefined}
+							value={contact.email}
+						/>
+						{
+							errors?.fieldErrors?.email ? (
+								<ErrorMessage>
+									{errors.fieldErrors.email[0]}
+								</ErrorMessage>
+							) : null
+						}
+					</div>
 				</div>
-				<div class="col-span-3 space-y-2">
-					<Label for="last_name">Last Name</Label>
-					<Input
-						id="last_name"
-						name="lastName"
-						tone={errors?.fieldErrors?.lastName
-							? "danger"
-							: undefined}
-						value={contact.lastName}
-					/>
-					{
-						errors?.fieldErrors?.lastName ? (
-							<ErrorMessage>
-								{errors.fieldErrors.lastName[0]}
-							</ErrorMessage>
-						) : null
-					}
-				</div>
-				<div class="col-span-6 space-y-2">
-					<Label for="phone">Phone</Label>
-					<Input
-						id="phone"
-						name="phone"
-						tone={errors?.fieldErrors?.phone ? "danger" : undefined}
-						value={contact.phone}
-					/>
-					{
-						errors?.fieldErrors?.phone ? (
-							<ErrorMessage>
-								{errors.fieldErrors.phone[0]}
-							</ErrorMessage>
-						) : null
-					}
-				</div>
-				<div class="col-span-6 space-y-2">
-					<Label for="email">Email</Label>
-					<Input
-						id="email"
-						name="email"
-						tone={errors?.fieldErrors?.email ? "danger" : undefined}
-						value={contact.email}
-					/>
-					{
-						errors?.fieldErrors?.email ? (
-							<ErrorMessage>
-								{errors.fieldErrors.email[0]}
-							</ErrorMessage>
-						) : null
-					}
-				</div>
-			</div>
-		</fieldset>
+			</fieldset>
+		</form>
 		<div class="flex items-center gap-3">
-			<Button type="submit">Save</Button>
+			<Button form="edit-contact" type="submit">Save</Button>
+			<form action={`/contacts/${contactId}/delete`} method="post">
+				<Button type="submit" tone="danger">Delete</Button>
+			</form>
 		</div>
-	</form>
+	</section>
 </Layout>

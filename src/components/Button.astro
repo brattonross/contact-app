@@ -1,41 +1,62 @@
 ---
 import type { HTMLAttributes } from "astro/types";
+import { cva, type VariantProps } from "class-variance-authority";
 import { twMerge } from "tailwind-merge";
 
-export type Props = HTMLAttributes<"button">;
+const buttonClass = cva(
+	[
+		"rounded",
+		"text-sm",
+		"font-medium",
+		"leading-6",
+		"cursor-default",
+		"ring-1",
+		"px-3.5",
+		"h-8",
+		"inline-flex",
+		"items-center",
+		"justify-center",
+		"shrink-0",
+		"tabular-nums",
+		"outline-none",
+		"focus:ring-2",
+	],
+	{
+		variants: {
+			tone: {
+				primary: [
+					"bg-grass-2",
+					"text-grass-11",
+					"ring-grass-7",
+					"hover:ring-grass-8",
+					"focus:ring-grass-8",
+					"active:bg-grass-3",
+					"active:ring-grass-8",
+				],
+				danger: [
+					"bg-tomato-2",
+					"text-tomato-11",
+					"ring-tomato-7",
+					"hover:ring-tomato-8",
+					"focus:ring-tomato-8",
+					"active:bg-tomato-3",
+					"active:ring-tomato-8",
+				],
+			},
+		},
+		defaultVariants: {
+			tone: "primary",
+		},
+	},
+);
 
-const { class: className, ...props } = Astro.props;
+type ButtonVariantProps = VariantProps<typeof buttonClass>;
+
+export type Props = HTMLAttributes<"button"> & ButtonVariantProps;
+
+const { class: className, tone, ...props } = Astro.props;
 ---
 
-<button
-	class={twMerge(
-		[
-			"bg-grass-2",
-			"text-grass-11",
-			"rounded",
-			"text-sm",
-			"font-medium",
-			"leading-6",
-			"cursor-default",
-			"ring-1",
-			"ring-grass-7",
-			"px-3.5",
-			"h-8",
-			"inline-flex",
-			"items-center",
-			"justify-center",
-			"shrink-0",
-			"tabular-nums",
-			"outline-none",
-			"hover:ring-grass-8",
-			"focus:ring-2",
-			"focus:ring-grass-8",
-			"active:bg-grass-3",
-			"active:ring-grass-8",
-		],
-		className,
-	)}
-	{...props}
->
+<button class={twMerge(buttonClass({ tone }), className)} {...props}>
 	<slot />
 </button>

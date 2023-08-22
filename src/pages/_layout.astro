@@ -1,3 +1,7 @@
+---
+import { flash } from "~/flash";
+---
+
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
@@ -18,5 +22,43 @@
 		<div class="px-6 py-12">
 			<slot />
 		</div>
+		<div
+			aria-label="Notifications"
+			class="pointer-events-none"
+			role="region"
+		>
+			<ol
+				class="fixed inset-x-1/2 bottom-0 z-[9999] m-0 flex w-[390px] max-w-full -translate-x-1/2 flex-col gap-2 p-5 outline-none"
+			>
+				{
+					flash.messages.map((message) => (
+						<li
+							aria-atomic="true"
+							aria-live="off"
+							class="rounded-md bg-white p-4 text-sm text-hi-contrast shadow ring-1 ring-slate-6 dark:bg-slate-3"
+							data-notification
+							role="status"
+						>
+							{message.message}
+						</li>
+					))
+				}
+			</ol>
+		</div>
+		<script>
+			const notifications = document.querySelectorAll(
+				"[data-notification]",
+			);
+			for (let i = 0; i < notifications.length; i++) {
+				const notification = notifications[i];
+				if (!notification) {
+					continue;
+				}
+
+				setTimeout(() => {
+					notification.remove();
+				}, 5000);
+			}
+		</script>
 	</body>
 </html>
