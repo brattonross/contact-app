@@ -87,12 +87,27 @@ prevPageUrl.searchParams.set("page", String(page - 1));
 						</tr>
 					))
 				}
+				{
+					results.hasMore ? (
+						<tr>
+							<td
+								colspan="6"
+								class="px-3 py-4 text-center text-sm first-of-type:pl-0"
+							>
+								<button
+									hx-target="closest tr"
+									hx-swap="outerHTML"
+									hx-select="tbody > tr"
+									hx-get={nextPageUrl.toString()}
+								>
+									Load More
+								</button>
+							</td>
+						</tr>
+					) : null
+				}
 			</tbody>
 		</table>
-		<nav class="flex items-center gap-3">
-			{page > 1 ? <A href={prevPageUrl.toString()}>Previous</A> : null}
-			{results.hasMore ? <A href={nextPageUrl.toString()}>Next</A> : null}
-		</nav>
 		<A href="/contacts/new">Add Contact</A>
 	</main>
 </Layout>
