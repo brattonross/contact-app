@@ -1,10 +1,14 @@
-export type Contact = {
-	id: number;
-	firstName: string;
-	lastName: string;
-	email: string;
-	phone: string;
-};
+import { z } from "zod";
+
+export const contactSchema = z.object({
+	id: z.number(),
+	firstName: z.string().min(1, "Required"),
+	lastName: z.string().min(1, "Required"),
+	email: z.string().email(),
+	phone: z.string().min(10, "Required"),
+});
+
+export type Contact = z.infer<typeof contactSchema>;
 
 class ContactsDb {
 	#contacts: Array<Contact> = [];

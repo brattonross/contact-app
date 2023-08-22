@@ -1,0 +1,9 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+export type Props = HTMLAttributes<"p">;
+---
+
+<p class="text-xs font-medium text-tomato-11" {...Astro.props}>
+	<slot />
+</p>

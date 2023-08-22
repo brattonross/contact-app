@@ -1,0 +1,43 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import { cva, type VariantProps } from "class-variance-authority";
+import { twMerge } from "tailwind-merge";
+
+const inputClass = cva(
+	"block w-full placeholder:text-slate-8 text-hi-contrast rounded-md bg-white dark:bg-slate-1 sm:text-sm sm:leading-6",
+	{
+		variants: {
+			tone: {
+				neutral: "border-slate-7",
+				danger: "border-tomato-9",
+			},
+		},
+		defaultVariants: {
+			tone: "neutral",
+		},
+	},
+);
+
+type InputVariantProps = VariantProps<typeof inputClass>;
+
+export type Props = HTMLAttributes<"input"> & InputVariantProps;
+
+const {
+	autocomplete = "off",
+	autocapitalize = "off",
+	class: className,
+	spellcheck = "false",
+	tone,
+	type = "text",
+	...props
+} = Astro.props;
+---
+
+<input
+	autocomplete={autocomplete}
+	autocapitalize={autocapitalize}
+	class={twMerge(inputClass({ tone }), className)}
+	spellcheck={spellcheck}
+	type={type}
+	{...props}
+/>

@@ -8,7 +8,10 @@
     "preview": "astro preview"
   },
   "dependencies": {
-    "astro": "^2.10.12"
+    "astro": "^2.10.12",
+    "class-variance-authority": "^0.7.0",
+    "tailwind-merge": "^1.14.0",
+    "zod": "^3.22.2"
   },
   "devDependencies": {
     "@astrojs/tailwind": "^4.0.0",

@@ -1,6 +1,9 @@
 ---
+import Input from "~/components/Input.astro";
 import { db } from "~/contacts.ts";
 import Layout from "../_layout.astro";
+import Label from "~/components/Label.astro";
+import A from "~/components/A.astro";
 
 const search = Astro.url.searchParams.get("q");
 const contacts = search ? await db.search(search) : await db.all();
@@ -9,15 +12,11 @@ const contacts = search ? await db.search(search) : await db.all();
 <Layout>
 	<main class="flex flex-col items-start gap-8">
 		<form action="/contacts" method="get">
-			<label for="search" class="sr-only">Search</label>
-			<input
+			<Label for="search" class="sr-only">Search</Label>
+			<Input
 				id="search"
-				autocomplete="off"
-				autocapitalize="off"
-				class="rounded-md bg-white dark:bg-slate-1 sm:text-sm"
 				name="q"
 				placeholder="Search"
-				spellcheck="false"
 				type="search"
 				value={search}
 			/>
@@ -68,26 +67,16 @@ const contacts = search ? await db.search(search) : await db.all();
 								{contact.phone}
 							</td>
 							<td class="flex items-center justify-end gap-2 whitespace-nowrap px-3 py-4 text-sm first-of-type:pl-0">
-								<a
-									href={`/contacts/${contact.id}/edit`}
-									class="text-blue-11 hover:underline"
-								>
+								<A href={`/contacts/${contact.id}/edit`}>
 									Edit
-								</a>
-								<a
-									href={`/contacts/${contact.id}`}
-									class="text-blue-11 hover:underline"
-								>
-									View
-								</a>
+								</A>
+								<A href={`/contacts/${contact.id}`}>View</A>
 							</td>
 						</tr>
 					))
 				}
 			</tbody>
 		</table>
-		<a href="/contacts/new" class="text-sm text-blue-11 hover:underline"
-			>Add Contact</a
-		>
+		<A href="/contacts/new">Add Contact</A>
 	</main>
 </Layout>

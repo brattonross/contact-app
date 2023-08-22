@@ -6,6 +6,10 @@ export default {
       borderColor: {
         DEFAULT: "hsl(var(--slate7))"
       },
+      colors: {
+        "lo-contrast": "hsl(var(--slate11))",
+        "hi-contrast": "hsl(var(--slate12))",
+      },
       divideColor: {
         DEFAULT: "hsl(var(--slate7))"
       },
