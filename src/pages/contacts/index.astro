@@ -5,8 +5,20 @@ import Layout from "../_layout.astro";
 import Label from "~/components/Label.astro";
 import A from "~/components/A.astro";
 
-const search = Astro.url.searchParams.get("q");
-const contacts = search ? await db.search(search) : await db.all();
+const query = Astro.url.searchParams.get("q");
+const page = Number(Astro.url.searchParams.get("page")) || 1;
+const results = query
+	? await db.search({
+			query,
+			page,
+	  })
+	: await db.all(page);
+
+const nextPageUrl = new URL(Astro.url);
+nextPageUrl.searchParams.set("page", String(page + 1));
+
+const prevPageUrl = new URL(Astro.url);
+prevPageUrl.searchParams.set("page", String(page - 1));
 ---
 
 <Layout>
@@ -18,7 +30,7 @@ const contacts = search ? await db.search(search) : await db.all();
 				name="q"
 				placeholder="Search"
 				type="search"
-				value={search}
+				value={query}
 			/>
 		</form>
 		<table class="w-full max-w-full border-collapse divide-y indent-0">
@@ -49,7 +61,7 @@ const contacts = search ? await db.search(search) : await db.all();
 			</thead>
 			<tbody class="divide-y">
 				{
-					contacts.map((contact) => (
+					results.contacts.map((contact) => (
 						<tr>
 							<td class="whitespace-nowrap px-3 py-4 text-left text-sm first-of-type:pl-0">
 								{contact.id}
@@ -77,6 +89,10 @@ const contacts = search ? await db.search(search) : await db.all();
 				}
 			</tbody>
 		</table>
+		<nav class="flex items-center gap-3">
+			{page > 1 ? <A href={prevPageUrl.toString()}>Previous</A> : null}
+			{results.hasMore ? <A href={nextPageUrl.toString()}>Next</A> : null}
+		</nav>
 		<A href="/contacts/new">Add Contact</A>
 	</main>
 </Layout>

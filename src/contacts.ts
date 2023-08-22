@@ -1,3 +1,4 @@
+import { faker } from "@faker-js/faker";
 import { z } from "zod";
 
 export const contactSchema = z.object({
@@ -10,44 +11,62 @@ export const contactSchema = z.object({
 
 export type Contact = z.infer<typeof contactSchema>;
 
+function createFakeContact(): Omit<Contact, "id"> {
+	const firstName = faker.person.firstName();
+	const lastName = faker.person.lastName();
+	const email = faker.internet.email({
+		firstName,
+		lastName,
+	});
+	const phone = faker.phone.number();
+	return { firstName, lastName, email, phone };
+}
+
+export type PaginatedContactsResult = {
+	contacts: ReadonlyArray<Contact>;
+	hasMore: boolean;
+}
+
+export type ContactSearchRequest = {
+	query: string;
+	page: number;
+}
+
 class ContactsDb {
 	#contacts: Array<Contact> = [];
 
 	public constructor() {
-		this.#contacts.push({
-			id: 1,
-			firstName: "John",
-			lastName: "Smith",
-			email: "john@example.com",
-			phone: "123-456-7890",
-		});
-		this.#contacts.push({
-			id: 2,
-			firstName: "Dana",
-			lastName: "Crandith",
-			email: "dcran@example.com",
-			phone: "123-456-7890",
-		});
-		this.#contacts.push({
-			id: 3,
-			firstName: "Edith",
-			lastName: "Neutvaar",
-			email: "en@example.com",
-			phone: "123-456-7890",
-		});
+		for (let i = 0; i < 100; i++) {
+			this.#contacts.push({
+				id: i + 1,
+				...createFakeContact(),
+			});
+		}
 	}
 
-	public async all(): Promise<ReadonlyArray<Contact>> {
-		return this.#contacts;
+	public async all(page: number): Promise<PaginatedContactsResult> {
+		const contacts = this.#contacts.slice((page - 1) * 10, page * 10);
+		return {
+			contacts,
+			hasMore: page * 10 < this.#contacts.length,
+		};
 	}
 
-	public async search(search: string): Promise<ReadonlyArray<Contact>> {
-		return this.#contacts.filter((contact) => {
+	public async search(request: ContactSearchRequest): Promise<PaginatedContactsResult> {
+		const query = request.query.toLowerCase();
+		const allResults = this.#contacts.filter((contact) => {
 			return (
-				contact.firstName.includes(search) ||
-				contact.lastName.includes(search)
+				contact.firstName.toLowerCase().includes(query) ||
+				contact.lastName.toLowerCase().includes(query) ||
+				contact.email.toLowerCase().includes(query) ||
+				contact.phone.toLowerCase().includes(query)
 			);
-		});
+		})
+		const contacts = allResults.slice((request.page - 1) * 10, request.page * 10);
+		return {
+			contacts,
+			hasMore: request.page * 10 < allResults.length,
+		};
 	}
 
 	public async getById(id: number): Promise<Contact | undefined> {
@@ -84,12 +103,12 @@ class ContactsDb {
 
 	public async emailExists(
 		email: string,
-		ignoreId?: number
+		ignoreId?: number,
 	): Promise<boolean> {
 		const contact = this.#contacts.find(
 			(contact) =>
 				contact.email.toLowerCase() === email.toLowerCase() &&
-				contact.id !== ignoreId
+				contact.id !== ignoreId,
 		);
 		return Boolean(contact);
 	}
