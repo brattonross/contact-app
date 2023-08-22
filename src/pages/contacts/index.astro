@@ -94,14 +94,15 @@ prevPageUrl.searchParams.set("page", String(page - 1));
 								colspan="6"
 								class="px-3 py-4 text-center text-sm first-of-type:pl-0"
 							>
-								<button
+								<span
 									hx-target="closest tr"
+									hx-trigger="revealed"
 									hx-swap="outerHTML"
 									hx-select="tbody > tr"
 									hx-get={nextPageUrl.toString()}
 								>
-									Load More
-								</button>
+									Loading more...
+								</span>
 							</td>
 						</tr>
 					) : null
