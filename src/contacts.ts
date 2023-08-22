@@ -69,6 +69,14 @@ class ContactsDb {
 		Object.assign(contact, props);
 		return contact;
 	}
+
+	public async delete(id: number): Promise<void> {
+		const index = this.#contacts.findIndex((contact) => contact.id === id);
+		if (index === -1) {
+			return;
+		}
+		this.#contacts.splice(index, 1);
+	}
 }
 
 export const db = new ContactsDb();
