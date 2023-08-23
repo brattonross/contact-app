@@ -1,0 +1,34 @@
+---
+import A from "~/components/A.astro";
+import type { Contact } from "~/contacts";
+
+export type Props = {
+	contacts: ReadonlyArray<Contact>;
+};
+---
+
+{
+	Astro.props.contacts.map((contact) => (
+		<tr>
+			<td class="whitespace-nowrap px-3 py-4 text-left text-sm first-of-type:pl-0">
+				{contact.id}
+			</td>
+			<td class="whitespace-nowrap px-3 py-4 text-left text-sm first-of-type:pl-0">
+				{contact.firstName}
+			</td>
+			<td class="whitespace-nowrap px-3 py-4 text-left text-sm first-of-type:pl-0">
+				{contact.lastName}
+			</td>
+			<td class="whitespace-nowrap px-3 py-4 text-left text-sm first-of-type:pl-0">
+				{contact.email}
+			</td>
+			<td class="whitespace-nowrap px-3 py-4 text-left text-sm first-of-type:pl-0">
+				{contact.phone}
+			</td>
+			<td class="flex items-center justify-end gap-2 whitespace-nowrap px-3 py-4 text-sm first-of-type:pl-0">
+				<A href={`/contacts/${contact.id}/edit`}>Edit</A>
+				<A href={`/contacts/${contact.id}`}>View</A>
+			</td>
+		</tr>
+	))
+}

@@ -4,6 +4,7 @@ import { db } from "~/contacts.ts";
 import Layout from "../_layout.astro";
 import Label from "~/components/Label.astro";
 import A from "~/components/A.astro";
+import Rows from "./_rows.astro";
 
 const query = Astro.url.searchParams.get("q");
 const page = Number(Astro.url.searchParams.get("page")) || 1;
@@ -19,101 +20,92 @@ nextPageUrl.searchParams.set("page", String(page + 1));
 
 const prevPageUrl = new URL(Astro.url);
 prevPageUrl.searchParams.set("page", String(page - 1));
+
+const isActiveSearch = Astro.request.headers.get("HX-Trigger") === "search";
 ---
 
-<Layout>
-	<main class="flex flex-col items-start gap-8">
-		<form action="/contacts" method="get">
-			<Label for="search" class="sr-only">Search</Label>
-			<Input
-				id="search"
-				hx-get="/contacts"
-				hx-trigger="search, keyup changed delay:200ms"
-				hx-target="tbody"
-				hx-select="tbody tr"
-				hx-push-url="true"
-				name="q"
-				placeholder="Search"
-				type="search"
-				value={query}
-			/>
-		</form>
-		<table class="w-full max-w-full border-collapse divide-y indent-0">
-			<thead>
-				<tr>
-					<th
-						class="px-3 py-3.5 text-left text-sm font-semibold first-of-type:pl-0"
-						scope="col">ID</th
-					>
-					<th
-						class="px-3 py-3.5 text-left text-sm font-semibold first-of-type:pl-0"
-						scope="col">First</th
-					>
-					<th
-						class="px-3 py-3.5 text-left text-sm font-semibold first-of-type:pl-0"
-						scope="col">Last</th
-					>
-					<th
-						class="px-3 py-3.5 text-left text-sm font-semibold first-of-type:pl-0"
-						scope="col">Email</th
-					>
-					<th
-						class="px-3 py-3.5 text-left text-sm font-semibold first-of-type:pl-0"
-						scope="col">Phone</th
-					>
-					<th></th>
-				</tr>
-			</thead>
-			<tbody class="divide-y">
-				{
-					results.contacts.map((contact) => (
+{
+	isActiveSearch ? (
+		<Rows contacts={results.contacts} />
+	) : (
+		<Layout>
+			<main class="flex flex-col items-start gap-8">
+				<form action="/contacts" method="get">
+					<Label for="search" class="sr-only">
+						Search
+					</Label>
+					<Input
+						id="search"
+						hx-get="/contacts"
+						hx-trigger="search, keyup changed delay:200ms"
+						hx-target="tbody"
+						hx-push-url="true"
+						name="q"
+						placeholder="Search"
+						type="search"
+						value={query}
+					/>
+				</form>
+				<table class="w-full max-w-full border-collapse divide-y indent-0">
+					<thead>
 						<tr>
-							<td class="whitespace-nowrap px-3 py-4 text-left text-sm first-of-type:pl-0">
-								{contact.id}
-							</td>
-							<td class="whitespace-nowrap px-3 py-4 text-left text-sm first-of-type:pl-0">
-								{contact.firstName}
-							</td>
-							<td class="whitespace-nowrap px-3 py-4 text-left text-sm first-of-type:pl-0">
-								{contact.lastName}
-							</td>
-							<td class="whitespace-nowrap px-3 py-4 text-left text-sm first-of-type:pl-0">
-								{contact.email}
-							</td>
-							<td class="whitespace-nowrap px-3 py-4 text-left text-sm first-of-type:pl-0">
-								{contact.phone}
-							</td>
-							<td class="flex items-center justify-end gap-2 whitespace-nowrap px-3 py-4 text-sm first-of-type:pl-0">
-								<A href={`/contacts/${contact.id}/edit`}>
-									Edit
-								</A>
-								<A href={`/contacts/${contact.id}`}>View</A>
-							</td>
-						</tr>
-					))
-				}
-				{
-					results.hasMore ? (
-						<tr>
-							<td
-								colspan="6"
-								class="px-3 py-4 text-center text-sm first-of-type:pl-0"
+							<th
+								class="px-3 py-3.5 text-left text-sm font-semibold first-of-type:pl-0"
+								scope="col"
 							>
-								<span
-									hx-target="closest tr"
-									hx-trigger="revealed"
-									hx-swap="outerHTML"
-									hx-select="tbody > tr"
-									hx-get={nextPageUrl.toString()}
-								>
-									Loading more...
-								</span>
-							</td>
+								ID
+							</th>
+							<th
+								class="px-3 py-3.5 text-left text-sm font-semibold first-of-type:pl-0"
+								scope="col"
+							>
+								First
+							</th>
+							<th
+								class="px-3 py-3.5 text-left text-sm font-semibold first-of-type:pl-0"
+								scope="col"
+							>
+								Last
+							</th>
+							<th
+								class="px-3 py-3.5 text-left text-sm font-semibold first-of-type:pl-0"
+								scope="col"
+							>
+								Email
+							</th>
+							<th
+								class="px-3 py-3.5 text-left text-sm font-semibold first-of-type:pl-0"
+								scope="col"
+							>
+								Phone
+							</th>
+							<th />
 						</tr>
-					) : null
-				}
-			</tbody>
-		</table>
-		<A href="/contacts/new">Add Contact</A>
-	</main>
-</Layout>
+					</thead>
+					<tbody class="divide-y">
+						<Rows contacts={results.contacts} />
+						{results.hasMore ? (
+							<tr>
+								<td
+									colspan="6"
+									class="px-3 py-4 text-center text-sm first-of-type:pl-0"
+								>
+									<span
+										hx-target="closest tr"
+										hx-trigger="revealed"
+										hx-swap="outerHTML"
+										hx-select="tbody > tr"
+										hx-get={nextPageUrl.toString()}
+									>
+										Loading more...
+									</span>
+								</td>
+							</tr>
+						) : null}
+					</tbody>
+				</table>
+				<A href="/contacts/new">Add Contact</A>
+			</main>
+		</Layout>
+	)
+}
