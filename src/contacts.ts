@@ -112,6 +112,10 @@ class ContactsDb {
 		);
 		return Boolean(contact);
 	}
+
+	public async count(): Promise<number> {
+		return this.#contacts.length;
+	}
 }
 
 export const db = new ContactsDb();
