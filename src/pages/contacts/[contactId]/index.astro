@@ -21,8 +21,17 @@ if (!["GET", "DELETE"].includes(Astro.request.method)) {
 
 if (Astro.request.method === "DELETE") {
 	await db.delete(contactId);
-	flash.success("Contact deleted.");
-	return Astro.redirect("/contacts", 303);
+
+	if (Astro.request.headers.get("HX-Trigger") === "delete-contact") {
+		flash.success("Contact deleted.");
+		return Astro.redirect("/contacts", 303);
+	} else {
+		return new Response("", {
+			headers: {
+				"content-type": "text/plain",
+			},
+		});
+	}
 }
 
 const contact = await db.getById(contactId);
