@@ -37,8 +37,13 @@ const { archiver } = Astro.props;
 			</div>
 		) : (
 			<div class="flex items-center gap-3">
-				<A href="/contacts/archive/file" hx-boost="false">
-					Archive Ready! Click here to download. &downarrow;
+				<A
+					href="/contacts/archive/file"
+					hx-boost="false"
+					x-effect="$el.click()"
+				>
+					Archive downloading! Click here if the download does not
+					start.
 				</A>
 				<Button hx-delete="/contacts/archive" tone="danger">
 					Clear Download
