@@ -31,6 +31,7 @@ prevPageUrl.searchParams.set("page", String(page - 1));
 				hx-trigger="search, keyup changed delay:200ms"
 				hx-target="tbody"
 				hx-select="tbody tr"
+				hx-push-url="true"
 				name="q"
 				placeholder="Search"
 				type="search"
