@@ -27,6 +27,10 @@ prevPageUrl.searchParams.set("page", String(page - 1));
 			<Label for="search" class="sr-only">Search</Label>
 			<Input
 				id="search"
+				hx-get="/contacts"
+				hx-trigger="search, keyup changed delay:200ms"
+				hx-target="tbody"
+				hx-select="tbody tr"
 				name="q"
 				placeholder="Search"
 				type="search"
