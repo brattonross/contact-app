@@ -1,0 +1,21 @@
+---
+import { archiver } from "~/archive";
+import ArchiveUi from "./_archiveUi.astro";
+
+if (!["GET", "POST", "DELETE"].includes(Astro.request.method)) {
+	return new Response("Method not allowed", {
+		status: 405,
+		headers: {
+			Allow: "GET, POST",
+		},
+	});
+}
+
+if (Astro.request.method === "POST") {
+	archiver.start();
+} else if (Astro.request.method === "DELETE") {
+	archiver.reset();
+}
+---
+
+<ArchiveUi archiver={archiver} />

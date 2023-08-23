@@ -1,0 +1,49 @@
+---
+import type { Archiver } from "~/archive";
+import A from "~/components/A.astro";
+import Button from "~/components/Button.astro";
+
+export type Props = {
+	archiver: Archiver;
+};
+
+const { archiver } = Astro.props;
+---
+
+<div id="archive-ui" class="w-full" hx-target="this" hx-swap="outerHTML">
+	{
+		archiver.status === "Waiting" ? (
+			<Button hx-post="/contacts/archive" tone="primary">
+				Download Contact Archive
+			</Button>
+		) : archiver.status === "Running" ? (
+			<div class="w-full space-y-1">
+				<p class="text-sm text-slate-11">
+					Your archive is being generated...
+				</p>
+				<div
+					class="h-5 w-full overflow-hidden rounded-md bg-slate-3 shadow-inner"
+					hx-get="/contacts/archive"
+					hx-trigger="load delay:500ms"
+				>
+					<div
+						id="archive-progress"
+						aria-valuenow={archiver.progress * 100}
+						class="h-5 h-full w-0 bg-blue-9 transition-[width] duration-[600ms] ease-in-out"
+						role="progressbar"
+						style={{ width: `${archiver.progress * 100}%` }}
+					/>
+				</div>
+			</div>
+		) : (
+			<div class="flex items-center gap-3">
+				<A href="/contacts/archive/file" hx-boost="false">
+					Archive Ready! Click here to download. &downarrow;
+				</A>
+				<Button hx-delete="/contacts/archive" tone="danger">
+					Clear Download
+				</Button>
+			</div>
+		)
+	}
+</div>

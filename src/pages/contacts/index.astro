@@ -8,6 +8,8 @@ import Rows from "./_rows.astro";
 import LoadingIndicator from "~/components/LoadingIndicator.astro";
 import Button from "~/components/Button.astro";
 import { flash } from "~/flash";
+import ArchiveUi from "./_archiveUi.astro";
+import { archiver } from "~/archive";
 
 if (!["GET", "DELETE"].includes(Astro.request.method)) {
 	return new Response(null, {
@@ -50,6 +52,7 @@ const isActiveSearch = Astro.request.headers.get("HX-Trigger") === "search";
 	) : (
 		<Layout>
 			<main class="flex flex-col items-start gap-4">
+				<ArchiveUi archiver={archiver} />
 				<div class="flex w-full items-center justify-between gap-6">
 					<form
 						action="/contacts"
