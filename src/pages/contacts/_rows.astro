@@ -4,6 +4,7 @@ import type { Contact } from "~/contacts";
 
 export type Props = {
 	contacts: ReadonlyArray<Contact>;
+	nextPageUrl?: string;
 };
 ---
 
@@ -31,4 +32,24 @@ export type Props = {
 			</td>
 		</tr>
 	))
+}
+{
+	Astro.props.nextPageUrl ? (
+		<tr>
+			<td
+				colspan="6"
+				class="px-3 py-4 text-center text-sm first-of-type:pl-0"
+			>
+				<span
+					hx-target="closest tr"
+					hx-trigger="revealed"
+					hx-swap="outerHTML"
+					hx-select="tbody > tr"
+					hx-get={Astro.props.nextPageUrl}
+				>
+					Loading more...
+				</span>
+			</td>
+		</tr>
+	) : null
 }

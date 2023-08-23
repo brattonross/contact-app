@@ -14,14 +14,28 @@ const {
 } = Astro.props;
 ---
 
-<input
-	autocomplete={autocomplete}
-	autocapitalize={autocapitalize}
-	class={twMerge(
-		"block w-full rounded-md border-slate-7 bg-white text-hi-contrast placeholder:text-slate-8 dark:bg-slate-1 sm:text-sm sm:leading-6 [&:has(+[data-error-message]:not(:empty))]:border-tomato-9",
-		className,
-	)}
-	spellcheck={spellcheck}
-	type={type}
-	{...props}
-/>
+<div class="relative">
+	<input
+		autocomplete={autocomplete}
+		autocapitalize={autocapitalize}
+		class={twMerge(
+			[
+				"block",
+				"w-full",
+				"rounded-md",
+				"border-slate-7",
+				"bg-white",
+				"text-hi-contrast",
+				"placeholder:text-slate-8",
+				"dark:bg-slate-1",
+				"sm:text-sm",
+				"sm:leading-6",
+				"[&:has(+[data-error-message]:not(:empty))]:border-tomato-9",
+			],
+			className,
+		)}
+		spellcheck={spellcheck}
+		type={type}
+		{...props}
+	/>
+</div>
