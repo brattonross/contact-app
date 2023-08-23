@@ -6,6 +6,22 @@ import Label from "~/components/Label.astro";
 import A from "~/components/A.astro";
 import Rows from "./_rows.astro";
 import LoadingIndicator from "~/components/LoadingIndicator.astro";
+import Button from "~/components/Button.astro";
+import { flash } from "~/flash";
+
+if (!["GET", "DELETE"].includes(Astro.request.method)) {
+	return new Response(null, {
+		status: 405,
+		statusText: "Method Not Allowed",
+	});
+}
+
+if (Astro.request.method === "DELETE") {
+	const formData = await Astro.request.formData();
+	const ids = formData.getAll("selected_contact_ids").map(Number);
+	await db.deleteMany(ids);
+	flash.success(`Deleted ${ids.length} contacts.`);
+}
 
 const query = Astro.url.searchParams.get("q");
 const page = Number(Astro.url.searchParams.get("page")) || 1;
@@ -33,78 +49,90 @@ const isActiveSearch = Astro.request.headers.get("HX-Trigger") === "search";
 		/>
 	) : (
 		<Layout>
-			<main class="flex flex-col items-start gap-8">
-				<form
-					action="/contacts"
-					method="get"
-					class="flex items-center gap-3"
-				>
-					<Label for="search" class="sr-only">
-						Search
-					</Label>
-					<Input
-						id="search"
-						hx-get="/contacts"
-						hx-trigger="search, keyup changed delay:200ms"
-						hx-target="tbody"
-						hx-push-url="true"
-						hx-indicator="#search-indicator"
-						name="q"
-						placeholder="Search"
-						type="search"
-						value={query}
-					/>
-					<LoadingIndicator id="search-indicator" />
-				</form>
-				<table class="w-full max-w-full border-collapse divide-y indent-0">
-					<thead>
-						<tr>
-							<th
-								class="px-3 py-3.5 text-left text-sm font-semibold first-of-type:pl-0"
-								scope="col"
-							>
-								ID
-							</th>
-							<th
-								class="px-3 py-3.5 text-left text-sm font-semibold first-of-type:pl-0"
-								scope="col"
-							>
-								First
-							</th>
-							<th
-								class="px-3 py-3.5 text-left text-sm font-semibold first-of-type:pl-0"
-								scope="col"
-							>
-								Last
-							</th>
-							<th
-								class="px-3 py-3.5 text-left text-sm font-semibold first-of-type:pl-0"
-								scope="col"
-							>
-								Email
-							</th>
-							<th
-								class="px-3 py-3.5 text-left text-sm font-semibold first-of-type:pl-0"
-								scope="col"
-							>
-								Phone
-							</th>
-							<th />
-						</tr>
-					</thead>
-					<tbody class="divide-y">
-						<Rows
-							contacts={results.contacts}
-							nextPageUrl={
-								results.hasMore
-									? nextPageUrl.toString()
-									: undefined
-							}
+			<main class="flex flex-col items-start gap-4">
+				<div class="flex w-full items-center justify-between gap-6">
+					<form
+						action="/contacts"
+						method="get"
+						class="flex items-center gap-3"
+					>
+						<Label for="search" class="sr-only">
+							Search
+						</Label>
+						<Input
+							id="search"
+							hx-get="/contacts"
+							hx-trigger="search, keyup changed delay:200ms"
+							hx-target="tbody"
+							hx-push-url="true"
+							hx-indicator="#search-indicator"
+							name="q"
+							placeholder="Search"
+							type="search"
+							value={query}
 						/>
-					</tbody>
-				</table>
-				<div class="flex items-center gap-3">
+						<LoadingIndicator id="search-indicator" />
+					</form>
 					<A href="/contacts/new">Add Contact</A>
+				</div>
+				<form class="w-full">
+					<Button
+						hx-delete="/contacts"
+						hx-confirm="Are you sure you want to delete the selected contacts?"
+						hx-target="body"
+						tone="danger"
+						type="submit"
+					>
+						Delete selected
+					</Button>
+					<table class="w-full max-w-full border-collapse divide-y indent-0">
+						<thead>
+							<tr>
+								<th />
+								<th
+									class="px-3 py-3.5 text-left text-sm font-semibold first-of-type:pl-0"
+									scope="col"
+								>
+									ID
+								</th>
+								<th
+									class="px-3 py-3.5 text-left text-sm font-semibold first-of-type:pl-0"
+									scope="col"
+								>
+									First
+								</th>
+								<th
+									class="px-3 py-3.5 text-left text-sm font-semibold first-of-type:pl-0"
+									scope="col"
+								>
+									Last
+								</th>
+								<th
+									class="px-3 py-3.5 text-left text-sm font-semibold first-of-type:pl-0"
+									scope="col"
+								>
+									Email
+								</th>
+								<th
+									class="px-3 py-3.5 text-left text-sm font-semibold first-of-type:pl-0"
+									scope="col"
+								>
+									Phone
+								</th>
+								<th />
+							</tr>
+						</thead>
+						<tbody class="divide-y">
+							<Rows
+								contacts={results.contacts}
+								nextPageUrl={
+									results.hasMore
+										? nextPageUrl.toString()
+										: undefined
+								}
+							/>
+						</tbody>
+					</table>
 					<span
 						class="text-xs text-lo-contrast"
 						hx-get="/contacts/count"
@@ -112,7 +140,7 @@ const isActiveSearch = Astro.request.headers.get("HX-Trigger") === "search";
 					>
 						<LoadingIndicator />
 					</span>
-				</div>
+				</form>
 			</main>
 		</Layout>
 	)

@@ -11,6 +11,14 @@ export type Props = {
 {
 	Astro.props.contacts.map((contact) => (
 		<tr class="[&.htmx-swapping]:opacity-0 [&.htmx-swapping]:transition-opacity">
+			<td>
+				<input
+					class="rounded border-slate-6 bg-white text-blue-9 outline-none focus:ring-blue-9 focus:ring-offset-white dark:bg-slate-1 dark:focus:ring-offset-slate-1"
+					name="selected_contact_ids"
+					type="checkbox"
+					value={contact.id}
+				/>
+			</td>
 			<td class="whitespace-nowrap px-3 py-4 text-left text-sm first-of-type:pl-0">
 				{contact.id}
 			</td>

@@ -101,6 +101,11 @@ class ContactsDb {
 		this.#contacts.splice(index, 1);
 	}
 
+	public async deleteMany(ids: Array<number>): Promise<void> {
+		await Promise.all(ids.map((id) => this.delete(id)));
+	}
+
+
 	public async emailExists(
 		email: string,
 		ignoreId?: number,
